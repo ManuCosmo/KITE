@@ -103,20 +103,26 @@ public class WebDriverFactory {
         ChromeOptions chromeOptions = new ChromeOptions();
         chromeOptions.addArguments("use-fake-ui-for-media-stream");
         chromeOptions.addArguments("use-fake-device-for-media-stream");
+        chromeOptions.addArguments("autoplay-policy=no-user-gesture-required");
         String extension = System.getProperty("kite.chrome.extension");
         if (extension!=null) {
           chromeOptions.addExtensions(new File(extension));
         }
-        if (browser.getFakeMediaFile() != null) {
+        if (browser.getFakeMediaFile() != null || browser.getFakeMediaAudio() != null) {
           chromeOptions.addArguments("allow-file-access-from-files");
-          chromeOptions
-              .addArguments("use-file-for-fake-video-capture=" + browser.getFakeMediaFile() + "");
+        }
+        if (browser.getFakeMediaFile() != null && browser.getFakeMediaFile().length() > 0) {
+          chromeOptions.addArguments("use-file-for-fake-video-capture=" + browser.getFakeMediaFile());
+        }
+        if (browser.getFakeMediaAudio() != null && browser.getFakeMediaAudio().length() > 0) {
+          chromeOptions.addArguments("use-file-for-fake-audio-capture=" + browser.getFakeMediaAudio());
         }
         if (browser.isHeadless()) {
           chromeOptions.addArguments("headless");
           // chromeOptions.addArguments("window-size=1980,960");
           // chromeOptions.addArguments("screenshot");
         }
+        chromeOptions.addArguments("window-size=1980,1280");
         for (String flag : browser.getFlags()) {
           chromeOptions.addArguments(flag);
         }

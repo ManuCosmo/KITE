@@ -25,7 +25,6 @@ import org.webrtc.kite.exception.*;
 import org.webrtc.kite.scheduler.MatrixRunnerJobListener;
 
 import javax.json.JsonException;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -63,7 +62,8 @@ public class Engine {
 
     Scheduler scheduler = null;
     try {
-      Configurator.getInstance().buildConfig(new File(args[0]));
+      Configurator.getInstance().setConfigFilePath(args[0]);
+      Configurator.getInstance().buildConfig();
       int interval = Configurator.getInstance().getInterval();
 
       // Grab the Scheduler instance from the Factory

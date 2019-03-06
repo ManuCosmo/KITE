@@ -75,6 +75,11 @@ public class Configurator {
   private int interval;
   private String commandName;
   private Instrumentation instrumentation;
+  private String configFilePath;
+
+  private boolean customMatrixOnly = false;
+  private List<JsonObject> customMatrix;
+  private List<List<Browser>> customBrowserMatrix = new ArrayList<List<Browser>>();
 
   private ConfigHandler configHandler;
 
@@ -136,12 +141,38 @@ public class Configurator {
   }
 
   /**
+   * isCustomerMatrixOnly
+   *
+   * @return
+   */
+  public boolean isCustomMatrixOnly() {
+    return customMatrixOnly;
+  }
+
+  /**
+   * getCustomBrowserMatrix
+   *
+   * @return
+   */
+  public List<List<Browser>> getCustomBrowserMatrix() {
+    return this.customBrowserMatrix;
+  }
+
+  /**
    * Gets config handler.
    *
    * @return the config handler
    */
   public ConfigHandler getConfigHandler() {
     return this.configHandler;
+  }
+
+  public String getConfigFilePath() {
+    return configFilePath;
+  }
+
+  public void setConfigFilePath(String configFilePath) {
+    this.configFilePath = configFilePath;
   }
 
   /**
@@ -156,7 +187,6 @@ public class Configurator {
   /**
    * Builds itself based on the content of the config file.
    *
-   * @param file a File representation of the config file.
    * @throws FileNotFoundException            if the file is not found on provided path.
    * @throws KiteUnsupportedIntervalException if an unsupported interval is found in 'interval'.
    * @throws KiteInsufficientValueException   if the number of remotes, tests and browsers is less
@@ -168,7 +198,7 @@ public class Configurator {
    * @throws InvocationTargetException        the invocation target exception
    * @throws KiteGridException                the kite grid exception
    */
-  public void buildConfig(File file)
+  public void buildConfig()
       throws IOException, KiteUnsupportedIntervalException, KiteInsufficientValueException,
       NoSuchMethodException, IllegalAccessException, InstantiationException,
       KiteUnsupportedRemoteException, InvocationTargetException, KiteGridException {
@@ -177,7 +207,7 @@ public class Configurator {
     JsonReader jsonReader = null;
     JsonObject jsonObject = null;
     try {
-      fileReader = new FileReader(file);
+      fileReader = new FileReader(new File(this.configFilePath));
       jsonReader = Json.createReader(fileReader);
       jsonObject = jsonReader.readObject();
     } finally {
@@ -214,6 +244,12 @@ public class Configurator {
     if (size < 1) {
       throw new KiteInsufficientValueException("Browser objects are less than one.");
     }
+
+    this.customMatrixOnly = jsonObject.getBoolean("customMatrixOnly", this.customMatrixOnly);
+
+    this.customMatrix = (List<JsonObject>) Utility
+        .throwNoKeyOrBadValueException(jsonObject, "matrix", JsonArray.class, true);
+
     browserObjectList = new ArrayList<JsonObject>(new LinkedHashSet<JsonObject>(browserObjectList));
     if (browserObjectList.size() != size) {
       logger.warn("Duplicate browser configurations in the config file have been removed.");
@@ -248,6 +284,19 @@ public class Configurator {
    * @return a matrix of browser tuples as List<List<Browser>>
    */
   public List<List<Browser>> buildTuples(int tupleSize) {
+
+    if (this.customMatrix != null) {
+      for (JsonStructure structure : this.customMatrix) {
+        JsonArray jsonArray = (JsonArray) structure;
+        List<Browser> browserList = new ArrayList<Browser>();
+        for (int i = 0; i < jsonArray.size(); i++)
+          browserList.add(this.configHandler.getBrowserList().get(jsonArray.getInt(i)));
+        this.customBrowserMatrix.add(browserList);
+      }
+
+      if (this.customMatrixOnly)
+        return null;
+    }
 
     List<Browser> focusedList = new ArrayList<>();
     List<Browser> browserList = (List<Browser>) this.configHandler.getBrowserList();

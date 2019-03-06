@@ -20,13 +20,11 @@ import eu.bitwalker.useragentutils.OperatingSystem;
 import eu.bitwalker.useragentutils.UserAgent;
 import eu.bitwalker.useragentutils.Version;
 import is.tagomor.woothee.Classifier;
-
-import javax.json.*;
-
 import org.apache.log4j.Logger;
 import org.webrtc.kite.Utility;
 import org.webrtc.kite.exception.KiteInsufficientValueException;
 
+import javax.json.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -55,6 +53,7 @@ public class Browser extends KiteConfigObject {
   private String remoteAddress;
   private String pathToBinary;
   private String fakeMediaFile;
+  private String fakeMediaAudio;
   private Mobile mobile;
 
   // Info from web driver
@@ -108,9 +107,10 @@ public class Browser extends KiteConfigObject {
     this.pathToBinary = jsonObject.getString("pathToBinary", "");
     this.fakeMediaFile = jsonObject.getString("fakeMediaFile", null);
     JsonValue jsonValue = jsonObject.getOrDefault("flags", null);
+    this.fakeMediaAudio = jsonObject.getString("fakeMediaAudio", null);
     if (jsonValue != null) {
       JsonArray flagArray = (JsonArray) jsonValue;
-      for (int i = 0; i < flagArray.size(); i++){
+      for (int i = 0; i < flagArray.size(); i++) {
         this.flags.add(flagArray.getString(i));
       }
     }
@@ -136,6 +136,7 @@ public class Browser extends KiteConfigObject {
     this.remoteAddress = browser.getRemoteAddress();
     this.pathToBinary = browser.getPathToBinary();
     this.fakeMediaFile =browser.getFakeMediaFile();
+    this.fakeMediaAudio = browser.getFakeMediaAudio();
     this.mobile = browser.getMobile();
   }
 
@@ -620,10 +621,10 @@ public class Browser extends KiteConfigObject {
 
   /**
    * For Chrome only.
-   * @param fakeMediaFile path to the video file to be used by Chrome as fakemedia
+   * @return path to the audio file to be used by Chrome as fakemedia, or null if no file has been specified
    */
-  public void setFakeMediaFile(String fakeMediaFile) {
-    this.fakeMediaFile = fakeMediaFile;
+  public String getFakeMediaAudio() {
+    return fakeMediaAudio;
   }
 
 }

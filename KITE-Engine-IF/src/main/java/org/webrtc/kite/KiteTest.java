@@ -17,20 +17,16 @@
 package org.webrtc.kite;
 
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.logging.LogEntries;
-import org.openqa.selenium.logging.LogEntry;
-import org.openqa.selenium.logging.LogType;
 
 import javax.json.JsonValue;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Parent class for a test case.
  * <p>
  * It provides a list of WebDriver objects to the child classes to execute the test algorithm.
+ * <p>
+ * It also contains the details of the node to which the test case is assigned.
  */
 public abstract class KiteTest {
 
@@ -50,7 +46,7 @@ public abstract class KiteTest {
    *
    * @param payload JsonValue
    */
-  protected void setPayload(JsonValue payload) {
+  public void setPayload(JsonValue payload) {
     this.payload = payload;
   }
 
@@ -60,6 +56,15 @@ public abstract class KiteTest {
 
 
 
+
+  /**
+   * Method to set a web driver list.
+   *
+   * @param webDriverList Web Driver List
+   */
+  public void setWebDriverList(List<WebDriver> webDriverList) {
+    this.webDriverList = webDriverList;
+  }
 
   /**
    * Sets the command name for the NW instrumentation.
@@ -80,39 +85,11 @@ public abstract class KiteTest {
   }
 
   /**
-   * Method to set a web driver list.
-   *
-   * @param webDriverList Web Driver List
-   */
-  public void setWebDriverList(List<WebDriver> webDriverList) {
-    this.webDriverList = webDriverList;
-  }
-
-  /**
    * Tests against List<WebDriver>
    *
    * @return Any object with a toString() implementation.
    * @throws Exception if an Exception occurs while method execution.
    */
   public abstract Object testScript() throws Exception;
-
-  /**
-   *
-   * @param driver the subject web driver that we want to get console log
-   * @return List of log entries.
-   */
-  public static List<String> analyzeLog(WebDriver driver) {
-    List<String> log = new ArrayList<>();
-    Set<String> logTypes =  driver.manage().logs().getAvailableLogTypes();
-    if (logTypes.contains(LogType.BROWSER)) {
-      LogEntries logEntries = driver.manage().logs().get(LogType.BROWSER);
-      for (LogEntry entry : logEntries) {
-        log.add(entry.getLevel() + " " + entry.getMessage().replaceAll("'", ""));
-      }
-    } else {
-      log.add("This browser does not support getting console log.");
-    }
-    return log;
-  }
 
 }

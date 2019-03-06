@@ -55,7 +55,6 @@ public class TestConf extends Test {
     super(callbackURL, jsonObject);
 
     this.tupleSize = jsonObject.getInt("tupleSize");
-
     this.noOfThreads = jsonObject.getInt("noOfThreads", 1);
     if (this.noOfThreads < 1)
       throw new KiteInsufficientValueException(

@@ -18,6 +18,7 @@ package org.webrtc.kite;
 
 import org.apache.log4j.Logger;
 import org.webrtc.kite.config.Browser;
+import org.webrtc.kite.config.Configurator;
 import org.webrtc.kite.config.TestConf;
 
 import java.util.ArrayList;
@@ -111,6 +112,13 @@ public class MatrixRunner {
    * multiThreadedList.
    */
   private void purgeListOfBrowserList() {
+
+    List<List<Browser>> customBrowserMatrix = Configurator.getInstance().getCustomBrowserMatrix();
+    if (this.listOfBrowserList == null) {
+      this.singleThreadedList.addAll(customBrowserMatrix);
+      return;
+    }
+
     for (List<Browser> browserList : this.listOfBrowserList) {
 
       // Omit test cases with two identical mobile clients in them.
@@ -146,6 +154,8 @@ public class MatrixRunner {
       // Add the rest of the test cases in multi thread list.
       this.multiThreadedList.add(browserList);
     }
+
+    this.singleThreadedList.addAll(customBrowserMatrix);
 
   }
 

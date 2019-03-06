@@ -19,21 +19,18 @@ package org.webrtc.kite.apprtc;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.NoAlertPresentException;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.logging.LogEntries;
+import org.openqa.selenium.logging.LogEntry;
+import org.openqa.selenium.logging.LogType;
 import org.openqa.selenium.remote.RemoteWebDriver;
-import org.webrtc.kite.KiteTest;
-import org.webrtc.kite.apprtc.network.IceConnectionTest;
 import org.webrtc.kite.apprtc.stats.*;
 
 import javax.json.*;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Utility class holding various static methods.
@@ -398,9 +395,27 @@ public class Utility {
    */
   public static JsonArrayBuilder getLog(WebDriver webDriver) {
     JsonArrayBuilder log = Json.createArrayBuilder();
-    List<String> logEntries = KiteTest.analyzeLog(webDriver);
+    List<String> logEntries = Utility.analyzeLog(webDriver);
     for (String entry: logEntries){
       log.add(entry);
+    }
+    return log;
+  }
+
+  /**
+   * @param driver the subject web driver that we want to get console log
+   * @return List of log entries.
+   */
+  private static List<String> analyzeLog(WebDriver driver) {
+    List<String> log = new ArrayList<>();
+    Set<String> logTypes = driver.manage().logs().getAvailableLogTypes();
+    if (logTypes.contains(LogType.BROWSER)) {
+      LogEntries logEntries = driver.manage().logs().get(LogType.BROWSER);
+      for (LogEntry entry : logEntries) {
+        log.add(entry.getLevel() + " " + entry.getMessage().replaceAll("'", ""));
+      }
+    } else {
+      log.add("This browser does not support getting console log.");
     }
     return log;
   }

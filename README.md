@@ -63,6 +63,28 @@ mvn clean install
 
 * If selenium is not running (step mentioned above), build will fail, as KITE-AppRTC-Test includes a Junit test that requires local selenium. 
 
+* Since the SimulcastTest is included, it requires its own server to be running. To start the server, go into the directory KITE-Multi-Simul-cast-Test/server/simulcast and run:
+
+```sh
+npm install
+npm run build-client
+MEDIA_SERVER_IP=localhost npm start
+```
+
+* Since the NoAdapterTest is included, it requires its own server to be running. To start the server, go into the directory KITE-NoAdapter-Test/server and run:
+
+```sh
+npm install && npm start
+```
+
+* Since the MulticastTest is included, it requires its own server to be running. To start the server, go into the directory KITE-Multi-Simul-cast-Test/server/multi-stream and run:
+
+```sh
+npm install && npm start
+```
+
+These servers listen to port 8081, 8083, 8085 respectively.
+
 You can skip all tests (not recommended) running maven with -DskipTests.
 ```
 mvn -DskipTests clean install 
@@ -85,6 +107,10 @@ mvn -DskipTests clean install
 | ------------- | ------------- |
 | cd apache-tomcat-8.5.20\bin  | cd apache-tomcat-8.5.20/bin  |
 | startup  | ./catalina.sh run  |
+
+_* if you cannot execute `catalina.sh`, try `sudo chmod 777 catalina.sh`_ 
+
+_** if_ `./catalina.sh run` _says_  `permission denied` _, try running it with sudo._
 
 5.  Now open a browser and access the following URL [*http://localhost:8080/kiteweb*](http://localhost:8080/kiteweb)
 
@@ -205,12 +231,12 @@ Execute the following command in the working directory, the last argument specif
 
 On Linux and Mac run:
 ```
-java -cp KITE-Engine/target/kite-jar-with-dependencies.jar:KITE-AppRTC-Test/target/apprtc-test-1.0.jar org.webrtc.kite.Engine ./KITE-AppRTC-Test/configs/local.config.json
+java -cp KITE-Engine/target/kite-jar-with-dependencies.jar:KITE-AppRTC-Test/target/apprtc-test-1.0.jar org.webrtc.kite.Engine PATH_TO_CONFIG_FILE
 ```
 
 On Windows run:
 ```
-java -cp KITE-Engine/target/kite-jar-with-dependencies.jar;KITE-AppRTC-Test/target/apprtc-test-1.0.jar org.webrtc.kite.Engine ./KITE-AppRTC-Test/configs/local.config.json
+java -cp KITE-Engine/target/kite-jar-with-dependencies.jar;KITE-AppRTC-Test/target/apprtc-test-1.0.jar org.webrtc.kite.Engine PATH_TO_CONFIG_FILE
 ```
 
 Since the h264 plugin for firefox is only installed after the browser has already been opened, it will be too late to use (results in failed/timeout tests between firefox and safari). You can use the minimal firefox profiles provided in folder 'third_party'. All you need to do is specify the location of the profile folder:

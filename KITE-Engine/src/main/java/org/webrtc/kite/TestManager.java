@@ -16,6 +16,7 @@
 
 package org.webrtc.kite;
 
+import com.cosmo.kite.KiteLoadTest;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
@@ -112,8 +113,9 @@ public class TestManager implements Callable<Object> {
    */
   private void populateDrivers(String testName) throws MalformedURLException {
     this.webDriverList = new ArrayList<WebDriver>();
-    for (Browser browser : this.browserList){
-      this.webDriverList.add(WebDriverUtility.getWebDriverForBrowser(testName, browser));
+    for (Browser browser : this.browserList) {
+      WebDriver webDriver = WebDriverUtility.getWebDriverForBrowser(testName, browser);
+      this.webDriverList.add(webDriver);
     }
   }
 
@@ -301,6 +303,11 @@ public class TestManager implements Callable<Object> {
 
         startTime = System.currentTimeMillis();
         object = test.testScript();
+
+        if (test instanceof KiteLoadTest) {
+          ((KiteLoadTest) test).setIncrement(this.webDriverList.size());
+          ((KiteLoadTest) test).getUserData();
+        }
         this.timeTaken = System.currentTimeMillis() - startTime;
       } catch (Exception e) {
         logger.warn("Exception while running the test", e);
@@ -322,7 +329,7 @@ public class TestManager implements Callable<Object> {
     }
 
     // Callback
-    if (ENABLE_CALLBACK)
+    if (ENABLE_CALLBACK) {
       if (this.testConf.getCallbackURL() == null) {
         logger.warn("No callback specified for " + this.testConf);
       } else {
@@ -336,7 +343,7 @@ public class TestManager implements Callable<Object> {
           callbackThread.postResult();
         }
       }
-
+    }
     return jsonObject;
 
   }

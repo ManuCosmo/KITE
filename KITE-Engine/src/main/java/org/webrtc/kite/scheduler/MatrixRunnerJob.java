@@ -55,42 +55,42 @@ public class MatrixRunnerJob extends KiteJob {
         }
       }
 
-      for (TestConf testConf : (List<TestConf>) Configurator.getInstance().getConfigHandler()
-          .getTestList()) {
-        try {
-          if (logger.isInfoEnabled()) {
-            logger.info("Running " + testConf + " ...");
-          }
-
-          List<Future<Object>> listOfResults = new MatrixRunner(testConf,
-              Configurator.getInstance().buildTuples(testConf.getTupleSize()), testConf.getName())
-              .run();
-
-          if (listOfResults != null) {
-            if (logger.isInfoEnabled()) {
-              String testResults = "The following are results for " + testConf + ":\n";
-              for (Future<Object> future : listOfResults) {
-                try {
-                  testResults += "\r\n" + future.get().toString();
-                } catch (Exception e) {
-                  logger.error("Exception while test execution", e);
-                }
-              }
-              testResults += "\r\nEND OF RESULTS\r\n";
-              logger.info(testResults);
-            }
-          } else {
-            logger.warn("No test case was found.");
-          }
-        } catch (InterruptedException e) {
-          logger.fatal("Error [Interruption]: The execution has been interrupted with the "
-              + "following error: " + e.getLocalizedMessage(), e);
-        } catch (ExecutionException e) {
-          logger.fatal(
-              "Error [Execution]: The execution has been ended with the following error: " + e
-                  .getLocalizedMessage(), e);
+    for (TestConf testConf : (List<TestConf>) Configurator.getInstance().getConfigHandler()
+        .getTestList()) {
+      try {
+        if (logger.isInfoEnabled()) {
+          logger.info("Running " + testConf + " ...");
         }
+
+        List<Future<Object>> listOfResults = new MatrixRunner(testConf,
+            Configurator.getInstance().buildTuples(testConf.getTupleSize()), testConf.getName())
+            .run();
+
+        if (listOfResults != null) {
+          if (logger.isInfoEnabled()) {
+            String testResults = "The following are results for " + testConf + ":\n";
+            for (Future<Object> future : listOfResults) {
+              try {
+                testResults += "\r\n" + future.get().toString();
+              } catch (Exception e) {
+                logger.error("Exception while test execution", e);
+              }
+            }
+            testResults += "\r\nEND OF RESULTS\r\n";
+            logger.info(testResults);
+          }
+        } else {
+          logger.warn("No test case was found.");
+        }
+      } catch (InterruptedException e) {
+        logger.fatal("Error [Interruption]: The execution has been interrupted with the "
+            + "following error: " + e.getLocalizedMessage(), e);
+      } catch (ExecutionException e) {
+        logger.fatal(
+            "Error [Execution]: The execution has been ended with the following error: "
+                + e.getLocalizedMessage(), e);
       }
+    }
 
       if (instrumentation != null) {
         try {
